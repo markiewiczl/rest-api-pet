@@ -60,7 +60,7 @@ class PetService implements PetServiceInterface
      */
     public function addPet(Request $request): array
     {
-        if ($this->dataToPet->isDataSetCorrectly($request))
+        if (!$this->dataToPet->isDataSetCorrectly($request))
         {
             throw new Exception('All fields need to be fulfilled', 0);
         }
@@ -83,7 +83,7 @@ class PetService implements PetServiceInterface
      */
     public function updatePet(Request $request, string $id): array
     {
-        if ($this->dataToPet->isDataSetCorrectly($request))
+        if (!$this->dataToPet->isDataSetCorrectly($request))
         {
             throw new Exception('All fields need to be fulfilled', 0);
         }

@@ -28,12 +28,12 @@ class DataToPetService implements DataToPetServiceInterface
 
     public function isDataSetCorrectly(Request $request): bool
     {
-        return !$request->input('id')
-            || !$request->input('category_id')
-            || !$request->input('category_name')
-            || !$request->input('name')
-            || !$request->input('photoUrls')
-            || !$request->input('tags')
-            || !$request->input('status');
+        return $request->input('id')
+            || $request->input('category_id')
+            || $request->input('category_name')
+            || $request->input('name')
+            || $request->input('photoUrls')
+            || $request->input('tags')
+            || $request->input('status');
     }
 }
