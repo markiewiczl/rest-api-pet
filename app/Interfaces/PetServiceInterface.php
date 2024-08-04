@@ -36,10 +36,11 @@ interface PetServiceInterface
     /**
      * Update pet by id
      *
-     * @param array $data
+     * @param Request $request
+     * @param string $id
      * @return array
      */
-    public function updatePet(Request $request, int $id): array;
+    public function updatePet(Request $request, string $id): array;
 
     /**
      * Removing pet by id

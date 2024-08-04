@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Interfaces\DataToPetServiceInterface;
 use App\Interfaces\PetServiceInterface;
 use Exception;
 use GuzzleHttp\Client;
@@ -15,7 +16,9 @@ class PetService implements PetServiceInterface
 {
     private Client $client;
 
-    public function __construct()
+    public function __construct(
+        private readonly DataToPetServiceInterface $dataToPet
+    )
     {
         $this->client = new Client([
             'base_uri' => PetServiceInterface::PET_SERVICE_URL,
@@ -57,30 +60,12 @@ class PetService implements PetServiceInterface
      */
     public function addPet(Request $request): array
     {
-        $data = [
-            'id' => $request->input('id'),
-            'category' => [
-                'id' => $request->input('category_id'),
-                'name' => $request->input('category_name')
-            ],
-            'name' => $request->input('name'),
-            'photoUrls' => explode(',', $request->input('photoUrls')),
-            'tags' => array_map(function($tag) {
-                return ['id' => 0, 'name' => $tag];
-            }, explode(',', $request->input('tags'))),
-            'status' => $request->input('status')
-        ];
-
-        if (
-            !$data['id']
-            || !$data['category']
-            || !$data['name']
-            || !$data['photoUrls']
-            || !$data['tags']
-            || !$data['status']
-        ) {
+        if ($this->dataToPet->isDataSetCorrectly($request))
+        {
             throw new Exception('All fields need to be fulfilled', 0);
         }
+
+        $data = $this->dataToPet->parse($request, (int)$request->input('id'));
 
         try {
             $response = $this->client->post('pet', [
@@ -96,21 +81,14 @@ class PetService implements PetServiceInterface
     /**
      * @inheritDoc
      */
-    public function updatePet(Request $request, int $id): array
+    public function updatePet(Request $request, string $id): array
     {
-        $data = [
-            'id' => $id,
-            'category' => [
-                'id' => $request->input('category_id'),
-                'name' => $request->input('category_name')
-            ],
-            'name' => $request->input('name'),
-            'photoUrls' => explode(',', $request->input('photoUrls')),
-            'tags' => array_map(function($tag) {
-                return ['id' => 0, 'name' => $tag];
-            }, explode(',', $request->input('tags'))),
-            'status' => $request->input('status')
-        ];
+        if ($this->dataToPet->isDataSetCorrectly($request))
+        {
+            throw new Exception('All fields need to be fulfilled', 0);
+        }
+
+        $data = $this->dataToPet->parse($request, (int)$id);
 
         try {
             $response = $this->client->put('pet', [
